@@ -504,9 +504,7 @@ function pageEvidence(){
   wrap.appendChild(table);t.appendChild(wrap);
   p.appendChild(t);
 
-  const pend=el("div","card");pend.appendChild(el("h3","","Figures still to verify before submission"));
-  pend.appendChild(el("div","muted","• Sequence findings from the groupmate’s Power BI file (not yet reproduced).<br>• Exact country-name labels on the map are our mapping of ISO codes; confirm the synthetic data’s intended country set.<br>• The 9,999,999 vs 10,000,000 raw count is explained by the disclaimer line — confirm your final import statement matches the reconciled figure."));
-  p.appendChild(pend);
+  
   return p;
 }
 

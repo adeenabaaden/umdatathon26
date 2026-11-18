@@ -152,7 +152,7 @@ function head(kicker,title,lede){const h=el("div","phead");h.appendChild(el("div
 function pageExec(){
   const p=el("div");
   p.appendChild(head("Page 1 of 8","Executive summary",
-    "We asked a single question: what rules might Swift have used to simulate these international payments, and how well do those rules explain what the data actually shows? The dataset contains 9,999,999 synthetic cross-border payments, recorded from 30 April to 31 July 2023."));
+    "<b>Problem statement:</b> Which rules govern Swift\u2019s simulated cross-border payments, and how do labelled anomalies depart from those patterns \u2014 including detecting routing visibility, FX conversions, and duplicate payments? The dataset contains 9,999,999 synthetic cross-border payments, recorded from 30 April to 31 July 2023."));
   const chips=el("div","chips");chips.appendChild(chip("rec"));chips.appendChild(chip("calc"));chips.appendChild(chip("mod"));p.appendChild(chips);
 
   const kp=el("div","kpis");

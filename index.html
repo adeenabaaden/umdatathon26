@@ -45,7 +45,7 @@ body{display:flex;flex-direction:column;overflow:hidden;background:#ffffff}
 .chart{position:absolute;inset:6px 10px 10px 10px;display:flex;align-items:center;justify-content:center}
 .chart img{width:100%;height:100%;object-fit:contain;display:block}
 .side{display:flex;flex-direction:column;gap:12px;min-height:0}
-.info{flex:1;border-radius:8px;background:#fff;border:1px solid var(--line);border-left:4px solid var(--orange);padding:11px 15px;display:flex;flex-direction:column;gap:4px;overflow:hidden;box-shadow:0 1px 3px rgba(34,34,34,.04)}
+.info{flex:1;border-radius:8px;background:#fff;border:1px solid var(--line);border-left:4px solid var(--orange);padding:10px 15px;display:flex;flex-direction:column;gap:4px;overflow:auto;box-shadow:0 1px 3px rgba(34,34,34,.04)}
 .info.how{border-left-color:var(--yellow)}
 .info.lim{border-left-color:var(--red)}
 .info .it{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--orange)}
@@ -80,7 +80,7 @@ const PAGES = [
   {id:"fx",n:3,title:"Currency conversion"},
   {id:"amounts",n:4,title:"Payment amounts"},
   {id:"timing",n:5,title:"Payment timing"},
-  {id:"duplicates",n:6,title:"Duplicate payments"},
+  {id:"anomalies",n:6,title:"Anomalies"},
 ];
 
 const CHART_DATA = {
@@ -94,64 +94,58 @@ const CHART_DATA = {
 
 const CONTENT = {
   routing: {
-    kicker:"Lead finding · Page 1 of 6",
-    headline:"Each extra bank a payment passes through cuts the chance its full route is recorded by about 5%",
-    lede:"Every payment travels a chain of banks from sender to receiver \u2014 we call this the payment\u2019s route. This page asks: how often is that whole chain actually visible in the data?",
-    metrics:[["9,999,999","payments in total (corrected data)"],["95% \u2192 77%","route fully visible at 2 banks \u2192 at 6 banks"],["July","separate test month, not used to build the rule"]],
-    chart:"routing_visibility", chartTitle:"How often the full route is recorded, by number of banks",
-    sample:"The July check used 2,957,371 payments. The May\u2013June pattern is based on 6,323,279 payments for the simplest two-bank routes.",
-    tested:"We learned the pattern from May and June, then checked it against July \u2014 a month we did not use to build the rule. The rule predicted a 34.864% continuation rate; we actually saw 34.929%, a very close match.",
-    limitation:"Routes through many banks (10 or more) are rare, so that end of the chart is less certain. July was kept entirely separate from the May\u2013June rule."
+    kicker:"Page 1 of 6",
+    finding:"The more institutions a payment passed through, the less often its full path was recorded.",
+    compared:"The chart compares what we predicted from May\u2013June with what we actually saw in July.",
+    why:"A payment is \u201cvisible\u201d when its whole path appears in the record, so this measures how completely the system logs transfers.",
+    metrics:[["95%","full path recorded with 2 institutions"],["62%","full path recorded with 10 institutions"]],
+    chart:"routing_visibility", chartTitle:"Share of payments with the full path recorded, by number of institutions",
+    checked:"We learned a pattern from May\u2013June (routes through 2\u201310 institutions) and checked it against July, which was not used to build it. The two-institution group had 6,323,279 payments and the July check 2,957,371. Each extra institution lowered the predicted share by about 5.19%, and predicted vs actual full-path rates were 34.864% vs 34.929%. Routes through 10 or more institutions are rare, so that end is less certain."
   },
   duration: {
-    kicker:"Finding · Page 2 of 6",
-    headline:"Adding one middle bank roughly tripled the typical wait \u2014 from 39 seconds to about 2 minutes",
-    lede:"A \u201cmiddle bank\u201d (intermediary) is a bank that forwards a payment rather than being the sender or receiver. We looked only at payments whose full route is recorded, then measured how long they take.",
-    metrics:[["6,008,013","payments with no middle bank"],["2,097,906","payments with one middle bank"],["105 / 105","fair comparisons where the wait went up"]],
-    chart:"payment_duration", chartTitle:"Typical time a payment takes, by number of middle banks",
-    sample:"6,008,013 fully-recorded payments had no middle bank; 2,097,906 had one.",
-    tested:"In all 105 like-for-like comparisons (same currency and same payment type) the typical wait rose.",
-    limitation:"It is not universal \u2014 between some bank pairs the wait actually fell, in 273 of 1,818 comparable cases."
+    kicker:"Page 2 of 6",
+    finding:"On fully visible routes, the typical payment took 39 seconds with no intermediary and 127 seconds with one.",
+    compared:"An intermediary is an institution between the sending and receiving institutions; we compared payments with the same currency and type as intermediaries were added.",
+    why:"Duration still varied among otherwise similar routes, so the step-up is typical rather than fixed.",
+    metrics:[["39 sec","typical, no intermediary"],["127 sec","typical, one intermediary"]],
+    chart:"payment_duration", chartTitle:"Typical time by number of intermediaries",
+    checked:"Fully recorded routes only: 6,008,013 payments had no intermediary and 2,097,906 had one. The typical time rose in all 105 like-for-like comparisons (same currency and payment type), but fell in 273 of 1,818 comparable same-bank-pair cases."
   },
   fx: {
-    kicker:"Finding · Page 3 of 6",
-    headline:"Longer routes almost always involve a currency exchange \u2014 84% with 2 banks, over 99% with 4 or more",
-    lede:"A currency conversion (FX) is when a payment switches from one currency to another along the way. This page shows how often that happens as the number of banks in the route grows.",
-    metrics:[["6,323,279","2-bank payments (84% had an exchange)"],["2,324,319","3-bank payments (96% had an exchange)"],["99%+","4 or more banks"]],
-    chart:"currency_conversion", chartTitle:"Chance a payment involves a currency exchange, by number of banks",
-    sample:"Based on 6,323,279 payments for two-bank routes and 2,324,319 for three-bank routes; it reaches 99% or more from four banks upward.",
-    tested:"When split into narrower currency and payment-type groups, 45 of 58 showed no clear change in the trend \u2014 a caution that the effect is not uniform everywhere.",
-    limitation:"Results differ by corridor: in 77 of 94 sender\u2013receiver bank pairs there was no clear upward trend."
+    kicker:"Page 3 of 6",
+    finding:"More payments involved a currency exchange on longer routes overall.",
+    compared:"We compared payments that had the same currency and the same payment type.",
+    why:"The mix of payments can make the overall rise look stronger than it is within comparable groups, where most showed little change.",
+    metrics:[["84%","had a currency exchange with 2 institutions"],["96%","had a currency exchange with 3 institutions"]],
+    chart:"currency_conversion", chartTitle:"Chance a payment involves a currency exchange, by number of institutions",
+    checked:"Groups had 6,323,279 payments (2 institutions) and 2,324,319 (3 institutions). Split by currency and payment type, 45 of 58 groups showed little change, and 77 of 94 sender\u2013receiver institution pairs showed no clear rise."
   },
   amounts: {
-    kicker:"Finding · Page 4 of 6",
-    headline:"Businesses paying businesses send the largest amounts \u2014 a typical US$22,900, versus just $463 between two consumers",
-    lede:"Payments are grouped by who sends and who receives: business (B) or consumer (C). \u201cMedian\u201d means the middle value \u2014 half of payments are larger, half are smaller.",
-    metrics:[["\u2248US$22,900","typical business \u2192 business"],["\u2248US$463","typical consumer \u2192 consumer"],["99 / 99","groupings where this order held"]],
-    chart:"payment_amounts", chartTitle:"Typical payment amount, by sender and receiver type",
-    sample:"Uses all 9,999,999 payments. Business\u2192business 2,270,945; consumer\u2192business 610,605; business\u2192consumer 5,603,691; consumer\u2192consumer 1,514,758.",
-    tested:"The same ranking held in all 99 currency-and-type groupings \u2014 even after removing 1,940 obvious amount-entry errors (fat-finger mistakes).",
-    limitation:"Medians describe the middle, not everyone \u2014 consumer payments are small and business payments vary widely."
+    kicker:"Page 4 of 6",
+    finding:"The typical business-to-business payment was much larger than the typical consumer-to-consumer payment.",
+    compared:"We compared the middle amount for each pairing of business and consumer senders and receivers.",
+    why:"\u201cTypical\u201d means the middle amount, and labelled amount-entry mistakes did not change the ranking.",
+    metrics:[["US$22,888","typical business \u2192 business"],["US$463","typical consumer \u2192 consumer"]],
+    chart:"payment_amounts", chartTitle:"Typical amount by sender and receiver",
+    checked:"Used all 9,999,999 payments: business\u2192business 2,270,945 and consumer\u2192consumer 1,514,758 (plus 5,603,691 business\u2192consumer and 610,605 consumer\u2192business). The ranking held in 99 of 99 currency-and-type groups, even after removing 1,940 labelled amount-entry mistakes."
   },
   timing: {
-    kicker:"Finding · Page 5 of 6",
-    headline:"Payments fall by 56.7% on weekends \u2014 about 56,600 a day, versus 130,900 on a weekday",
-    lede:"We counted payments per calendar day across 13 full weeks, then compared weekends with weekdays.",
-    metrics:[["\u224856,600","payments per weekend day"],["\u2248130,900","payments per weekday"],["56.7% fewer","payments per day on weekends"]],
+    kicker:"Page 5 of 6",
+    finding:"The dataset recorded fewer payments on a typical weekend day.",
+    compared:"We compared payments per day, because there are more weekdays than weekend days.",
+    why:"The comparison uses complete weeks in UTC (one global time standard), so it does not reflect local business hours.",
+    metrics:[["56,625","payments per weekend day"],["130,897","payments per weekday"]],
     chart:"payment_timing", chartTitle:"Average payments per day: weekdays vs weekends",
-    sample:"Covers 9,980,551 payments over 13 full weeks (65 weekdays and 26 weekend days).",
-    tested:"The weekend dip appeared in all 4 business/consumer combinations.",
-    limitation:"Times use UTC (one global standard), so this doesn\u2019t tell us about local business hours in each country."
+    checked:"Covered 9,980,551 payments over 13 complete weeks (65 weekdays, 26 weekend days). Weekend volume was 56.7% lower per day, and the dip appeared in all 4 business/consumer pairings."
   },
-  duplicates: {
-    kicker:"Finding · Page 6 of 6",
-    headline:"Payments flagged as duplicates come back in about 18 minutes, while unflagged look-alikes take about 15 days",
-    lede:"A \u201cduplicate\u201d here means the same amount, in the same currency, between the same two accounts, sent twice. We measured the time from each repeat to the next one.",
-    metrics:[["\u224818 min","typical gap for flagged duplicates"],["\u224815 days","typical gap for unflagged look-alikes"],["494 vs 3,131","gaps measured in each group"]],
-    chart:"duplicate_payments", chartTitle:"Typical time between one repeat and the next",
-    sample:"Flagged duplicates: 185 groups (494 gaps). Unflagged look-alikes: 2,439 groups (3,131 gaps).",
-    tested:"We measured the gap between consecutive matching payments (same amount, currency and accounts) and compared the flagged group with the unflagged one.",
-    limitation:"A short gap strongly suggests an accidental repeat, but the unflagged group is only a comparison \u2014 any automatic \u201cduplicate\u201d cut-off would need its own testing."
+  anomalies: {
+    kicker:"Page 6 of 6",
+    finding:"Different labels showed different patterns.",
+    compared:"A repeat here means the same amount, currency and two accounts; we compared labelled payments with otherwise comparable ones.",
+    why:"All CEO-labelled payments came from businesses, all romance-labelled from consumers, and labelled duplicates repeated sooner \u2014 these are patterns in synthetic data, and a detection rule would need its own test.",
+    metrics:[["Businesses only","CEO-labelled payments"],["Consumers only","romance-labelled payments"],["\u224818 min vs 15 days","labelled vs unlabelled repeat timing"]],
+    chart:"duplicate_payments", chartTitle:"Typical time before a repeat: labelled vs unlabelled",
+    checked:"Flagged duplicates: 185 groups (494 repeats) with a median gap of about 18 minutes; unlabelled look-alikes: 2,439 groups (3,131 repeats) at about 15 days. CEO and romance coverage is read directly from the label fields."
   }
 };
 
@@ -169,8 +163,7 @@ function buildPage(p){
   const c=CONTENT[p.id];
   const head=el("div","phead");
   head.appendChild(el("div","kicker",c.kicker));
-  head.appendChild(el("h1","",c.headline));
-  head.appendChild(el("div","lede",c.lede));
+  head.appendChild(el("h1","",c.finding));
   d.appendChild(head);
 
   const mrow=el("div","metrics");
@@ -196,18 +189,18 @@ function buildPage(p){
   body.appendChild(chartV);
 
   const side=el("div","side");
-  const sample=el("div","info");
-  sample.appendChild(el("div","it","Data included"));
-  sample.appendChild(el("div","ib",c.sample));
-  side.appendChild(sample);
-  const how=el("div","info how");
-  how.appendChild(el("div","it","How we checked it"));
-  how.appendChild(el("div","ib",c.tested));
-  side.appendChild(how);
-  const lim=el("div","info lim");
-  lim.appendChild(el("div","it","Main limitation"));
-  lim.appendChild(el("div","ib",c.limitation));
-  side.appendChild(lim);
+  const cmp=el("div","info");
+  cmp.appendChild(el("div","it","What we compared"));
+  cmp.appendChild(el("div","ib",c.compared));
+  side.appendChild(cmp);
+  const why=el("div","info how");
+  why.appendChild(el("div","it","Why it matters"));
+  why.appendChild(el("div","ib",c.why));
+  side.appendChild(why);
+  const chk=el("div","info lim");
+  chk.appendChild(el("div","it","How we checked"));
+  chk.appendChild(el("div","ib",c.checked));
+  side.appendChild(chk);
   body.appendChild(side);
 
   d.appendChild(body);

@@ -342,9 +342,9 @@ function pageAnomalies(){
   p.appendChild(head("Page 7 of 8","Anomaly patterns",
    "Different labels track different senders: all CEO-labelled payments came from businesses and all romance-labelled from consumers, and labelled duplicates repeated far sooner than comparable unlabelled repeats.",
    "A comparable repeat is the same amount, in the same currency, between the same two accounts. We distinguish the number of payments from the number of gaps measured between them."));
-  p.appendChild(kpis([["7,006","labelled anomalies (0.07%)"],["945","CEO-scam payments"],["2,476","romance-scam payments"],["679","labelled duplicate payments"]]));
+  p.appendChild(kpis([["7,006","labelled anomalies (0.07%)"],["US$176.6 bn","anomaly exposure (sum of amounts)"],["945","CEO-scam payments"],["2,476","romance-scam payments"],["679","labelled duplicate payments"]]));
   const base=el("div","card");base.appendChild(el("h3","","Baseline: ordinary payments are mixed"));
-  base.appendChild(el("div","muted","Across all 9,999,999 payments, 7,006 carry an anomaly label (about 0.07%). Ordinary payments come from a mix of senders — overall about 79% business and 21% consumer. The labelled groups below depart sharply from that baseline."));
+  base.appendChild(el("div","muted","Across all 9,999,999 payments, 7,006 carry an anomaly label (about 0.07%). Ordinary payments come from a mix of senders — overall about 79% business and 21% consumer. The labelled groups below depart sharply from that baseline. Combined exposure is about US$176.6 bn, but it is dominated by amount-entry (fat-finger) errors (~US$175.1 bn); actual scam labels are far smaller (CEO ~US$1.31 bn, romance ~US$4.8 m)."));
   p.appendChild(base);
   const g=el("div","grid g2");
   const ceo=el("div","card");ceo.appendChild(el("h3","","CEO-scam label: 100% business senders"));
@@ -358,7 +358,7 @@ function pageAnomalies(){
   p.appendChild(imgCard("Time before a repeat: labelled duplicates vs unlabelled look-alikes",
     "Median consecutive gap between matching payments (same amount, currency and two accounts).",
     "duplicate_payments","Gap, not group span.",
-    how("How we checked","<b>Calculated from the data.</b><ul><li><b>Comparable repeat:</b> same amount, currency, and sending and receiving accounts.</li><li><b>Payments vs gaps:</b> labelled duplicates = 679 payments in 185 groups, giving 494 consecutive gaps (median about 18 min ≈ 1,099 s). Unlabelled look-alikes = 5,570 payments in 2,439 groups, giving 3,131 gaps (median about 15 days ≈ 1,259,534 s).</li><li><b>Sequence findings:</b> a groupmate’s sequence analysis (separate Power BI file) cannot be read as aggregate data here, so sequence conclusions are excluded and must be reproduced from the reconciled 9,999,999-record dataset before use.</li></ul>")));
+    how("How we checked","<b>Calculated from the data.</b><ul><li><b>Comparable repeat:</b> same amount, currency, and sending and receiving accounts.</li><li><b>Payments vs gaps:</b> labelled duplicates = 679 payments in 185 groups, giving 494 consecutive gaps (median about 18 min ≈ 1,099 s). Unlabelled look-alikes = 5,570 payments in 2,439 groups, giving 3,131 gaps (median about 15 days ≈ 1,259,534 s).</li><li><b>Groupmate check:</b> we reviewed the groupmate’s Power BI model file; it contains only summary measures (median duration, median USD, anomaly count, anomaly USD exposure) and derived fields (anomaly flag, country codes, cross-border flag, hour, day of week) — no sequence analysis — so there is no sequence finding to reproduce or chart.</li></ul>")));
   p.appendChild(el("div","muted","<b>What a reviewer could investigate:</b> unusual business-to-business payments (CEO), high-frequency consumer transfers (romance), and near-simultaneous identical payments (duplicates). These are patterns in synthetic data; a real detection rule would need its own validation."));
   return p;
 }
